@@ -1,11 +1,17 @@
 #include <iostream>
-#include <string.h>
+#include <exception>
+#include <string>
 
-#include "asm/token.hpp"
+#include "asm/lexer.hpp"
 
 int main(int argc, char **argv)
 {
-    Asm::Token t(Asm::TokenType::Symbol, std::string("Hello World !"));
-    std::cout << "min-as" << std::endl;
+    try{
+        Asm::Lexer l;
+        l.tokenizeFile("./samples/hello_world.min");
+    }catch(std::exception &e){
+        std::cerr << "Err : " << e.what() << std::endl;
+    }
+
     return 0;
 }
