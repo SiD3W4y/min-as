@@ -1,0 +1,17 @@
+string hello_world "Hello World !\n" ; Defining a string symbol
+num size 14 ; Or a number symbol
+
+fn exit
+	mov $A 0x02
+	ldrb $B #hello_world
+	sys
+
+fn main
+	mov $A 0x00 
+	mov $B 0x00	
+	mov $C #hello_world	
+	ldr $D #size		
+	sys			
+	jmp #exit
+
+string useless_string "Hey it's me, useless !"
