@@ -9,7 +9,8 @@ namespace Asm {
         Reg,
         Value,
         Ref,
-        String
+        String,
+        Eof
     };
 
     class Token {
