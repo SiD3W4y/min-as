@@ -6,6 +6,7 @@
 namespace Asm {
     enum TokenType {
         Symbol,
+        Op,
         Reg,
         Value,
         Ref,
@@ -23,9 +24,16 @@ namespace Asm {
             void setValue(std::string value);
             std::string getValue();
 
+            void setRow(int r);
+            void setCol(int c);
+            int getRow();
+            int getCol();
+
         private:
             TokenType type;
             std::string value;
+            int row = 0;
+            int col = 0;
 
     };
 }
