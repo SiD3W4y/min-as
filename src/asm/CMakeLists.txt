@@ -1,4 +1,8 @@
 project(asm)
 
 set(asm_SOURCES
-	src/lexer.cpp
+	lexer.cpp
+	token.cpp)
+
+add_library(${PROJECT_NAME} ${asm_SOURCES})
+
