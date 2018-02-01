@@ -40,7 +40,27 @@ namespace Asm {
     void Lexer::appendToken(std::string data)
     {
         // For debug we add everything as a symbol
-        std::cout << "Token : " << data << std::endl;
+        Token tk(TokenType::Symbol, data);
+        tk.setCol(st_col-data.size());
+        tk.setRow(st_row);
+
+        if(data.size() > 1){
+            if(data[0] == '$'){
+               tk.setType(TokenType::Reg);
+//               std::cout << "Reg : " << data << std::endl;
+            }
+
+            if(data[0] == '#'){
+                tk.setType(TokenType::Ref);
+//                std::cout << "Ref : " << data << std::endl;
+            }
+
+            if(data[0] == '0' && data[1] == 'x'){
+                tk.setType(TokenType::Value);
+ //               std::cout << "Value : " << data << std::endl;
+            }
+        }
+
         tokens.push_back(Token(TokenType::Symbol,data));
     }
 
@@ -74,8 +94,8 @@ namespace Asm {
         // State 0 : In quoted string
         // State 1 : Escape sequence
         int state = -1;
-        int row = 1;
-        int col = 0;
+        st_row = 1;
+        st_col = 0;
         char current_char;
         
         for(std::string::iterator it = data.begin(); it != data.end(); ++it){
@@ -86,7 +106,12 @@ namespace Asm {
                     case 0:
                         if(current_char == '"'){
                             state = -1;
-                            appendToken(current_token);
+
+                            Token t(TokenType::String,current_token);
+                            t.setCol(st_col-current_token.size());
+                            t.setRow(st_row);
+
+                            appendToken(t);
                             current_token.clear();
                         }else if(current_char == '\\'){
                             state = 1;
@@ -114,12 +139,12 @@ namespace Asm {
                             while(*it != '\n' && it != data.end()) // Skips comments
                                 ++it;
                             
-                            row++;
-                            col = 0;
+                            st_row++;
+                            st_col = 0;
                             break;
                         case '\n':
-                            col = 0;
-                            row++;
+                            st_col = 0;
+                            st_row++;
                             break;
                         case '"':
                             state = 0;
