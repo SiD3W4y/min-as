@@ -11,6 +11,9 @@ namespace Asm {
         Value,
         Ref,
         String,
+        Lbrack, // [
+        Rbrack, // ]
+        Sep, // ,
         Eof
     };
 
