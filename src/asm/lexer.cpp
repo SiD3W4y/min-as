@@ -47,17 +47,14 @@ namespace Asm {
         if(data.size() > 1){
             if(data[0] == '$'){
                tk.setType(TokenType::Reg);
-//               std::cout << "Reg : " << data << std::endl;
             }
 
             if(data[0] == '#'){
                 tk.setType(TokenType::Ref);
-//                std::cout << "Ref : " << data << std::endl;
             }
 
             if(data[0] == '0' && data[1] == 'x'){
                 tk.setType(TokenType::Value);
- //               std::cout << "Value : " << data << std::endl;
             }
         }
 
@@ -148,6 +145,27 @@ namespace Asm {
                             break;
                         case '"':
                             state = 0;
+                            break;
+                        case ',':
+                        case '[':
+                        case ']':
+                            if(current_token.length() > 0){
+                                appendToken(current_token);
+                                current_token.clear();
+                            }
+
+                            // TODO : Clean this
+                            switch(current_char){
+                                case ',':
+                                    appendToken(Token(TokenType::Sep,","));
+                                    break;
+                                case ']':
+                                    appendToken(Token(TokenType::Rbrack,"]"));
+                                    break;
+                                case '[':
+                                    appendToken(Token(TokenType::Lbrack,"["));
+                                    break;
+                            }
                             break;
                         default:
                             current_token += current_char;
