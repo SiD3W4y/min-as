@@ -4,15 +4,14 @@
 #include <tuple>
 #include <string>
 
-#include "ir/serializable.hpp"
-
-namespace ir {
+namespace codegen {
     enum ArgType {
         Ref,
+        Reg,
         Value
     };
 
-    class Argument : public IrObject {
+    class Argument {
         public:
             Argument(std::string ref_name);
             Argument(int imm);
@@ -24,20 +23,28 @@ namespace ir {
             int getValue();
             
             ArgType getType();
+            int getSize();
 
         private:
             ArgType type;
             int imm_value;
-            std::string ref_name;
+            std::string ref_name = nullptr;
     };
 
-    class Instruction : public IrObject {
+    class Instruction {
         public: 
             Instruction();
             Instruction(int opcode);
+            
+            int getOpcode();
+            int getSize();
+            bool isPure(); // Are all references fixed = ready for compilation
 
+            void setFirst(Argument first);
+            void setSecond(Argument second);
         private:
             std::tuple<Argument, Argument> args;
+            int opcode = 0;
     };
 }
 
