@@ -29,7 +29,6 @@ static char getEscape(char code)
 namespace Asm {
     Lexer::Lexer()
     {
-        it = tokens.begin();
     }
 
     Lexer::Lexer(std::string path)
@@ -37,11 +36,22 @@ namespace Asm {
         tokenizeFile(path);
     }
 
+    Token Lexer::getNext()
+    {
+    if(it >= tokens.end())
+            return Token(TokenType::Eof,"");
+
+        Token tk = *it;
+        ++it;
+
+        return tk;
+    }
+
     void Lexer::appendToken(std::string data)
     {
         // For debug we add everything as a symbol
         Token tk(TokenType::Symbol, data);
-        tk.setCol(st_col-data.size());
+        tk.setCol(st_col);
         tk.setRow(st_row);
 
         if(data.size() > 1){
@@ -58,7 +68,7 @@ namespace Asm {
             }
         }
 
-        tokens.push_back(Token(TokenType::Symbol,data));
+        tokens.push_back(tk);
     }
 
     void Lexer::appendToken(Token t)
@@ -82,7 +92,8 @@ namespace Asm {
 
         tokenizeString(s.str());
     }
-
+    
+    // TODO : Implement correctly row/col counting
     void Lexer::tokenizeString(std::string data)
     {
         std::string current_token;
@@ -97,6 +108,7 @@ namespace Asm {
         
         for(std::string::iterator it = data.begin(); it != data.end(); ++it){
             current_char = *it;
+            st_col++;
 
             if(state >= 0){
                 switch(state){
@@ -176,6 +188,9 @@ namespace Asm {
        }
 
         if(current_token.length() > 0)
-            appendToken(current_token); 
+            appendToken(current_token);
+        
+        appendToken(Token(TokenType::Eof, ""));
+        it = tokens.begin(); 
     }
 }
