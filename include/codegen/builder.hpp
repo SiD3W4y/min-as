@@ -4,8 +4,10 @@
 #include <vector>
 #include <tuple>
 #include <string>
+#include <unordered_map>
 
 #include "codegen/instruction.hpp"
+#include "asm/lexer.hpp"
 #include "asm/token.hpp"
 
 namespace Codegen {
@@ -13,13 +15,14 @@ namespace Codegen {
     // Class Parsing+Generating code to a stream
     class Builder {
         public:
-            Builder(std::vector<Asm::Token> toks);
+            Builder(Asm::Lexer lex);
 
             void compile(std::string output_path);
 
         private:
             std::vector<std::tuple<int, Instruction>> to_patch; // Tuples of instruction + offset to patch when resolving refs
-            std::vector<Asm::Token> tokens;
+            std::unordered_map<std::string, int> symbols;
+            Asm::Lexer lexer;
     };
 
 }
