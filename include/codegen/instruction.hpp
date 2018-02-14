@@ -3,32 +3,20 @@
 
 #include <tuple>
 #include <string>
+#include <cstdint>
+#include <ostream>
 
-namespace codegen {
+namespace Codegen {
     enum ArgType {
         Ref,
         Reg,
         Value
     };
 
-    class Argument {
-        public:
-            Argument(std::string ref_name);
-            Argument(int imm);
-            
-            void setValue(int imm);
-            void setValue(std::string ref);
-
-            std::string getReference();
-            int getValue();
-            
-            ArgType getType();
-            int getSize();
-
-        private:
-            ArgType type;
-            int imm_value;
-            std::string ref_name = nullptr;
+    struct Argument {
+        ArgType type;
+        std::string value;
+        uint32_t imm_value;
     };
 
     class Instruction {
@@ -42,6 +30,8 @@ namespace codegen {
 
             void setFirst(Argument first);
             void setSecond(Argument second);
+        
+            friend std::ostream& operator<<(std::ostream& stream, const Instruction &ins);
         private:
             std::tuple<Argument, Argument> args;
             int opcode = 0;
