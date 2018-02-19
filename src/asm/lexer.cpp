@@ -51,7 +51,7 @@ namespace Asm {
     {
         // For debug we add everything as a symbol
         Token tk(TokenType::Symbol, data);
-        tk.setCol(st_col);
+        tk.setCol(st_col-data.size());
         tk.setRow(st_row);
 
         if(data.size() > 1){
@@ -66,6 +66,10 @@ namespace Asm {
             if(data[0] == '0' && data[1] == 'x'){
                 tk.setType(TokenType::Value);
             }
+        }
+
+        if(keywords.find(data) != keywords.end()){
+            tk.setType(keywords[data]);
         }
 
         tokens.push_back(tk);

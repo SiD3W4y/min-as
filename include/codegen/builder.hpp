@@ -5,6 +5,7 @@
 #include <tuple>
 #include <string>
 #include <unordered_map>
+#include <fstream>
 
 #include "codegen/instruction.hpp"
 #include "asm/lexer.hpp"
@@ -20,9 +21,17 @@ namespace Codegen {
             void compile(std::string output_path);
 
         private:
+            // parse functions will actually parse+compile the code
+            void parseStringDecl();
+            void parseNumDecl();
+            void parseBytesDecl();
+            void parseSlotDecl();
+            void parseFnDecl();
+
             std::vector<std::tuple<int, Instruction>> to_patch; // Tuples of instruction + offset to patch when resolving refs
             std::unordered_map<std::string, int> symbols;
             Asm::Lexer lexer;
+            std::fstream fd;
     };
 
 }

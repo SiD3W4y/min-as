@@ -3,10 +3,14 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 #include "asm/token.hpp"
 
 namespace Asm {
+
+    extern std::unordered_map<std::string, TokenType> keywords;
+
     class Lexer {
         public:
             Lexer();

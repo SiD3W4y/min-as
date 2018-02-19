@@ -18,6 +18,7 @@ namespace Codegen {
 
     static void check_type(Asm::Token tk, Asm::TokenType target)
     {
+        // check_type needs to support custom error messages for better error reporting
         if(tk.getType() != target){
             // TODO : Add line printing
             std::stringstream error_message;
@@ -29,12 +30,63 @@ namespace Codegen {
         }
     }
 
+    void Builder::parseStringDecl()
+    {
+        Asm::Token name = lexer.getNext();
+        Asm::Token user_string = lexer.getNext();
+
+        check_type(user_string, Asm::TokenType::String);
+
+        symbols[name.getValue()] = fd.tellg();
+
+        fd << user_string.getValue();
+    }
+
+    void Builder::parseBytesDecl()
+    {
+        // TODO : Parse bytes to uint -> write bytes to fd
+        std::vector<std::string> bytes;
+        
+        Asm::Token bt_name = lexer.getNext();
+        Asm::Token brack = lexer.getNext();
+
+        check_type(brack, Asm::TokenType::Lbrack);
+
+        Asm::Token current = lexer.getNext();
+
+        while(current.getType() != Asm::TokenType::Rbrack){
+            check_type(current, Asm::TokenType::Value);
+
+            bytes.push_back(current.getValue());
+            current = lexer.getNext();
+
+            if(current.getType() == Asm::TokenType::Sep)
+                current = lexer.getNext(); // Skipping commas
+        } 
+    }
+
+    void Builder::parseNumDecl()
+    {
+
+    }
+
+    void Builder::parseSlotDecl()
+    {
+
+    }
+
+    void Builder::parseFnDecl()
+    {
+        // TODO : Handle error handling for multiple definition
+        Asm::Token fn_name = lexer.getNext();
+        symbols[fn_name.getValue()] = fd.tellg();
+    }
+
     void Builder::compile(std::string output_path)
     {
         // TODO : Implement parsing and generation (custom stream)
         
         Asm::Token current = lexer.getNext();
-        std::fstream fd;
         fd.open(output_path, std::ios::out | std::ios::binary);
 
         if(!fd.is_open())
@@ -43,17 +95,16 @@ namespace Codegen {
         // TODO : Write header to start of file
 
         while(current.getType() != Asm::TokenType::Eof){
-            // TODO : Add token types for keywords (fn, string, bytes, slot, num, ...)
-            if(current.getValue() == "string"){
-                Asm::Token name = lexer.getNext();
-                Asm::Token string_data = lexer.getNext();
-
-                check_type(name, Asm::TokenType::Symbol);
-                check_type(string_data, Asm::TokenType::String);
-
-                symbols[name.getValue()] = fd.tellg();
-                
-                fd << string_data.getValue();
+            switch(current.getType()){
+                case Asm::TokenType::FnDecl:
+                    parseFnDecl();
+                    break;
+                case Asm::TokenType::BytesDecl:
+                    parseBytesDecl();
+                    break;
+                default:
+                    // do nothing
+                    break;
             }
 
             current = lexer.getNext();
