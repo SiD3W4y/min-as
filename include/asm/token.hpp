@@ -2,6 +2,7 @@
 #define TOKEN_HPP
 
 #include <string>
+#include <unordered_map>
 
 namespace Asm {
     enum TokenType {
@@ -14,8 +15,16 @@ namespace Asm {
         Lbrack, // [
         Rbrack, // ]
         Sep, // ,
+        StringDecl,
+        BytesDecl,
+        NumDecl,
+        SlotDecl,
+        FnDecl,
         Eof
     };
+    
+
+    extern std::unordered_map<std::string, TokenType> keywords;
 
     class Token {
         public:
