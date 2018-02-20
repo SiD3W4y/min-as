@@ -63,7 +63,7 @@ namespace Asm {
                 tk.setType(TokenType::Ref);
             }
 
-            if(data[0] == '0' && data[1] == 'x'){
+            if(data[0] >= '0' && data[0] <= '9'){
                 tk.setType(TokenType::Value);
             }
         }
