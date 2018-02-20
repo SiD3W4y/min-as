@@ -6,9 +6,11 @@
 #include <iostream>
 #include <fstream>
 
+#include "utils/convert.hpp"
 #include "codegen/builder.hpp"
 #include "asm/lexer.hpp"
 #include "asm/token.hpp"
+
 
 namespace Codegen {
 
@@ -67,12 +69,24 @@ namespace Codegen {
 
     void Builder::parseNumDecl()
     {
+        Asm::Token n_name = lexer.getNext();
+        Asm::Token n_value = lexer.getNext();
 
+        check_type(n_name, Asm::TokenType::Symbol);
+        check_type(n_value, Asm::TokenType::Value);
+
+        symbols[n_name.getValue()] = fd.tellg();
     }
 
     void Builder::parseSlotDecl()
     {
+        Asm::Token sl_name = lexer.getNext();
+        Asm::Token sl_value = lexer.getNext();
+        
+        check_type(sl_name, Asm::TokenType::Symbol);
+        check_type(sl_value, Asm::TokenType::Value);
 
+        symbols[sl_name.getValue()] = fd.tellg();
     }
 
     void Builder::parseFnDecl()
@@ -101,6 +115,12 @@ namespace Codegen {
                     break;
                 case Asm::TokenType::BytesDecl:
                     parseBytesDecl();
+                    break;
+                case Asm::TokenType::StringDecl:
+                    parseStringDecl();
+                    break;
+                case Asm::TokenType::SlotDecl:
+                    parseSlotDecl();
                     break;
                 default:
                     // do nothing
