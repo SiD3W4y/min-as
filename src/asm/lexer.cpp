@@ -57,10 +57,12 @@ namespace Asm {
         if(data.size() > 1){
             if(data[0] == '$'){
                tk.setType(TokenType::Reg);
+               tk.setValue(data.substr(1, data.size()));
             }
 
             if(data[0] == '#'){
                 tk.setType(TokenType::Ref);
+                tk.setValue(data.substr(1, data.size()));
             }
 
             if(data[0] >= '0' && data[0] <= '9'){
