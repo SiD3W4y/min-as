@@ -12,4 +12,4 @@ add_subdirectory(src/codegen)
 
 add_executable(min-as src/main.cpp)
 
-target_link_libraries(min-as utils asm codegen)
+target_link_libraries(min-as asm codegen utils)
