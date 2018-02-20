@@ -9,11 +9,12 @@
 namespace Codegen {
 
     // Instruction
-    Instruction::Instruction() : args(std::tuple<Argument, Argument>({ArgType::Reg, nullptr, 0}, {ArgType::Reg, nullptr, 0})), opcode(-1)
+    // Initializing the strings to nullptr causes a segfault so we use an empty string instead
+    Instruction::Instruction() : args(std::tuple<Argument, Argument>({ArgType::Reg, "", 0}, {ArgType::Reg, "", 0})), opcode(-1)
     {
     }
 
-    Instruction::Instruction(int op) : args(std::tuple<Argument, Argument>({ArgType::Reg, nullptr, 0}, {ArgType::Reg, nullptr, 0})), opcode(op)
+    Instruction::Instruction(int op) : args(std::tuple<Argument, Argument>({ArgType::Reg, "", 0}, {ArgType::Reg, "", 0})), opcode(op)
     {
     }
 
@@ -45,6 +46,15 @@ namespace Codegen {
             size += 4;
 
         return size;
+    }
+
+    bool Instruction::isPure()
+    {
+        if(std::get<0>(args).type == ArgType::Ref || std::get<1>(args).type == ArgType::Ref){
+            return false;
+        }
+
+        return true;
     }
 
     std::ostream &operator<<(std::ostream &stream, const Instruction &ins)
