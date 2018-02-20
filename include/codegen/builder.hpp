@@ -27,6 +27,8 @@ namespace Codegen {
             void parseBytesDecl();
             void parseSlotDecl();
             void parseFnDecl();
+            void parseOpStmt(Asm::Token op);
+            Argument processArg();
 
             std::vector<std::tuple<int, Instruction>> to_patch; // Tuples of instruction + offset to patch when resolving refs
             std::unordered_map<std::string, int> symbols;

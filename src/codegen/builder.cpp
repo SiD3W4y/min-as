@@ -8,6 +8,8 @@
 
 #include "utils/convert.hpp"
 #include "codegen/builder.hpp"
+#include "codegen/instruction.hpp"
+#include "codegen/ops.hpp"
 #include "asm/lexer.hpp"
 #include "asm/token.hpp"
 
@@ -42,6 +44,7 @@ namespace Codegen {
         symbols[name.getValue()] = fd.tellg();
 
         fd << user_string.getValue();
+        fd << '\x00';
     }
 
     void Builder::parseBytesDecl()
@@ -96,6 +99,52 @@ namespace Codegen {
         symbols[fn_name.getValue()] = fd.tellg();
     }
 
+    Argument Builder::processArg()
+    {
+        Asm::Token arg_tk = lexer.getNext();
+        Argument arg;
+        
+        if(arg_tk.getType() == Asm::TokenType::Value){
+            arg.type = ArgType::Value;
+            arg.imm_value = Utils::str_to_int(arg_tk.getValue()); 
+        }else if(arg_tk.getType() == Asm::TokenType::Ref){
+            arg.type = ArgType::Ref;
+            arg.value = arg_tk.getValue();
+        }else if(arg_tk.getType() == Asm::TokenType::Reg){
+            arg.type = ArgType::Reg;
+
+            if(registers.find(arg_tk.getValue()) == registers.end())
+                throw std::runtime_error("Could not find register : "+arg_tk.getValue());
+
+            arg.imm_value = registers[arg_tk.getValue()];
+        }else{
+            throw new std::runtime_error("Not a valid argument -> "+arg_tk.getValue());
+        }
+
+        return arg;
+    }
+
+    void Builder::parseOpStmt(Asm::Token op)
+    {
+        // If target is recognized as an op, it is in the map
+        OpInfo op_info = opcodes[op.getValue()];
+        Instruction ins(op_info.opcode);
+        
+        if(op_info.arg_count > 2){
+            throw new std::runtime_error("Too many arguments for opcode");
+        }
+
+        if(op_info.arg_count == 1){
+            ins.setFirst(processArg());
+        }
+
+        if(op_info.arg_count == 2){
+            ins.setFirst(processArg());
+            ins.setSecond(processArg());
+        }
+
+    }
+
     void Builder::compile(std::string output_path)
     {
         // TODO : Implement parsing and generation (custom stream)
@@ -121,6 +170,9 @@ namespace Codegen {
                     break;
                 case Asm::TokenType::SlotDecl:
                     parseSlotDecl();
+                    break;
+                case Asm::TokenType::Op:
+                    parseOpStmt(current);
                     break;
                 default:
                     // do nothing
