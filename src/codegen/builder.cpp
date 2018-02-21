@@ -29,7 +29,6 @@ namespace Codegen {
             error_message << "Wrong token type at position (";
             error_message << tk.getRow() << ", " << tk.getCol();
             error_message << ")" << std::endl;
-
             throw std::runtime_error(error_message.str()); 
         }
     }
@@ -50,24 +49,33 @@ namespace Codegen {
     void Builder::parseBytesDecl()
     {
         // TODO : Parse bytes to uint -> write bytes to fd
-        std::vector<std::string> bytes;
+        std::vector<char> bytes;
         
         Asm::Token bt_name = lexer.getNext();
         Asm::Token brack = lexer.getNext();
+        
+        symbols[bt_name.getValue()] = fd.tellp();
 
         check_type(brack, Asm::TokenType::Lbrack);
 
         Asm::Token current = lexer.getNext();
 
-        while(current.getType() != Asm::TokenType::Rbrack){
+        while (current.getType() != Asm::TokenType::Rbrack) {
             check_type(current, Asm::TokenType::Value);
 
-            bytes.push_back(current.getValue());
+            bytes.push_back(Utils::str_to_byte(current.getValue()));
             current = lexer.getNext();
 
             if(current.getType() == Asm::TokenType::Sep)
                 current = lexer.getNext(); // Skipping commas
-        } 
+        }
+
+        std::vector<char>::iterator it;
+        
+        // Maybe I should do it in a single loop ?
+        for (it = bytes.begin(); it != bytes.end(); ++it) {
+            fd << *it;
+        }
     }
 
     void Builder::parseNumDecl()
@@ -79,7 +87,6 @@ namespace Codegen {
         check_type(n_value, Asm::TokenType::Value);
 
         symbols[n_name.getValue()] = fd.tellg();
-        std::cout << "Adding : " << n_name.getValue() << std::endl;
 
         int value = Utils::str_to_int(n_value.getValue());
 
