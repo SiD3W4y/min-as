@@ -53,7 +53,7 @@ namespace Asm {
         tk.setCol(st_col-data.size());
         tk.setRow(st_row);
 
-        if(data.size() > 1){
+        if(data.size() >= 1){
             if(data[0] == '$'){
                tk.setType(TokenType::Reg);
                tk.setValue(data.substr(1, data.size()));
