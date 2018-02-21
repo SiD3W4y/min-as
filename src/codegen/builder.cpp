@@ -20,16 +20,11 @@ namespace Codegen {
     {
     }
 
-    static void check_type(Asm::Token tk, Asm::TokenType target)
+    void Builder::check_type(Asm::Token tk, Asm::TokenType target)
     {
         // check_type needs to support custom error messages for better error reporting
         if(tk.getType() != target){
-            // TODO : Add line printing
-            std::stringstream error_message;
-            error_message << "Wrong token type at position (";
-            error_message << tk.getRow() << ", " << tk.getCol();
-            error_message << ")" << std::endl;
-            throw std::runtime_error(error_message.str()); 
+            throw Asm::CodeException("Wrong token type", lexer.getLine(tk.getRow()), tk);
         }
     }
 

@@ -27,6 +27,24 @@ static char getEscape(char code)
 }
 
 namespace Asm {
+    CodeException::CodeException(std::string message, std::string line, Token t) : std::runtime_error("CodeException"), msg(message), line(line), token(t)
+    {
+        std::stringstream s;
+        std::string padding(token.getCol(), ' ');
+        s << "L " << t.getRow() << ":" << t.getCol() << " ";
+        s << msg << std::endl;
+        s << line << std::endl;
+        s << padding << '^' << std::endl;
+        
+        msg = s.str();
+    }
+
+    const char *CodeException::what() const noexcept
+    {        
+        return msg.c_str();
+    }
+
+
     Lexer::Lexer()
     {
     }
@@ -45,6 +63,16 @@ namespace Asm {
         ++it;
 
         return tk;
+    }
+
+    std::string Lexer::getLine(int lineno)
+    {
+        int idx = lineno - 1;
+
+        if (idx < 0 || idx >= lines.size())
+            return "";
+
+        return lines[idx];
     }
 
     void Lexer::appendToken(std::string data)
@@ -102,7 +130,8 @@ namespace Asm {
     void Lexer::tokenizeString(std::string data)
     {
         std::string current_token;
-        
+        std::string current_line;
+
         // State -1 : Not in quoted string
         // State 0 : In quoted string
         // State 1 : Escape sequence
@@ -111,14 +140,22 @@ namespace Asm {
         st_col = 0;
         char current_char;
         
-        for(std::string::iterator it = data.begin(); it != data.end(); ++it){
+        for (std::string::iterator it = data.begin(); it != data.end(); ++it) {
             current_char = *it;
             st_col++;
 
-            if(state >= 0){
-                switch(state){
+            if (current_char == '\n') {
+                lines.push_back(current_line);
+                current_line = "";
+                st_col = 0;
+            } else {
+                current_line += current_char;
+            }
+
+            if (state >= 0) {
+                switch(state) {
                     case 0:
-                        if(current_char == '"'){
+                        if (current_char == '"') {
                             state = -1;
 
                             Token t(TokenType::String,current_token);
@@ -127,9 +164,9 @@ namespace Asm {
 
                             appendToken(t);
                             current_token.clear();
-                        }else if(current_char == '\\'){
+                        } else if(current_char == '\\') {
                             state = 1;
-                        }else{
+                        } else {
                             current_token += current_char;
                         }
                         break;
@@ -153,10 +190,16 @@ namespace Asm {
                             while(*it != '\n' && it != data.end()) // Skips comments
                                 ++it;
                             
+                            lines.push_back(current_line);
+                            current_line = "";
+
                             st_row++;
                             st_col = 0;
                             break;
                         case '\n':
+                            lines.push_back(current_line);
+                            current_line = "";
+
                             st_col = 0;
                             st_row++;
                             break;
@@ -194,8 +237,11 @@ namespace Asm {
 
         if(current_token.length() > 0)
             appendToken(current_token);
+
+        if(current_line.length() > 0)
+            lines.push_back(current_line);
         
         appendToken(Token(TokenType::Eof, ""));
-        it = tokens.begin(); 
+        it = tokens.begin();
     }
 }
