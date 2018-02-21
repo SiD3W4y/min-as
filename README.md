@@ -3,9 +3,13 @@
 Complete rewrite of min-cc in c++, with hopefully cleaner code and better user experience.
 
 ## Roadmap
-- [x] Lexer (except byte arrays)
-- [ ] Parser
-- [ ] Codegen
+- [ ] Error logging
+- [ ] Command line arguments
+- [ ] Non file based stream
+
+- [x] Lexer
+- [x] Parser
+- [x] Codegen
 
 ## Documentation
 TODO
