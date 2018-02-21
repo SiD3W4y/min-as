@@ -27,7 +27,9 @@ namespace Codegen {
             int getOpcode();
             int getSize();
             bool isPure(); // Are all references fixed = ready for compilation
-
+            
+            Argument getFirst();
+            Argument getSecond();
             void setFirst(Argument first);
             void setSecond(Argument second);
         

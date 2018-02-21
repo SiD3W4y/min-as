@@ -28,6 +28,7 @@ namespace Codegen {
             void parseSlotDecl();
             void parseFnDecl();
             void parseOpStmt(Asm::Token op);
+            void writeStub(int len);
             Argument processArg();
 
             std::vector<std::tuple<int, Instruction>> to_patch; // Tuples of instruction + offset to patch when resolving refs

@@ -49,7 +49,6 @@ namespace Asm {
 
     void Lexer::appendToken(std::string data)
     {
-        // For debug we add everything as a symbol
         Token tk(TokenType::Symbol, data);
         tk.setCol(st_col-data.size());
         tk.setRow(st_row);
