@@ -2,6 +2,7 @@
 #include <tuple>
 #include <stdexcept>
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <iostream>
 #include <fstream>
