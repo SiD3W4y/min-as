@@ -3,7 +3,7 @@ num size 14 ; Or a number symbol
 
 fn exit
 	mov $A 0x02
-	ldrb $B #hello_world
+	ldrb $B #hello_world ; Should do exit(72)
 	sys
 
 fn main
