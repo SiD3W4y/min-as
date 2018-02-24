@@ -1,24 +1,16 @@
 # Min-as
 Min language assembler
-## Roadmap
-- [ ] Error logging
-- [X] Command line arguments
-- [X] Non file based stream
-
-- [x] Lexer
-- [x] Parser
-- [x] Codegen
-
 ## Documentation
-### What is it ?
-This project is an assembler for the min assembly language used min-vm. It is a complete rewrite of a previous iteration (called min-cc), but this time in c++ with the goal of having a better stability and user experience. It can produce a radare2 symbol file to make debugging work easier.
+## What is it ?
+This project is an assembler for the min assembly language used by min-vm. It is a complete rewrite of a previous iteration (called min-cc), but this time in c++ with the goal of having a better stability and user experience. It can produce a radare2 symbol file to make debugging work easier.
 
-### Installing
+## Installing
 ```
 $ cmake .
 $ make
 ```
-### Usage
+## Usage
+
 ```
 ./min-as {OPTIONS}
 
@@ -39,3 +31,14 @@ Importing symbols into radare2 :
 ```
 $ r2 -i symbols.r2 <file.mx>
 ```
+
+## Roadmap
+- [ ] Error logging
+- [ ] Code cleaning
+- [X] Command line arguments
+- [X] Non file based stream
+
+- [x] Lexer
+- [x] Parser
+- [x] Codegen
+
