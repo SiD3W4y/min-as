@@ -5,7 +5,7 @@
 #include <tuple>
 #include <string>
 #include <unordered_map>
-#include <fstream>
+#include <sstream>
 
 #include "codegen/instruction.hpp"
 #include "asm/lexer.hpp"
@@ -17,9 +17,9 @@ namespace Codegen {
     class Builder {
         public:
             Builder(Asm::Lexer lex);
-
-            void compile(std::string output_path);
-
+            
+            std::string compile();
+            std::string getSymbolMap(); // returns the symbols with corresponding offsets as a radare2 project file
         private:
             // parse functions will actually parse+compile the code
             void parseStringDecl();
@@ -35,7 +35,9 @@ namespace Codegen {
             std::vector<std::tuple<int, Instruction>> to_patch; // Tuples of instruction + offset to patch when resolving refs
             std::unordered_map<std::string, int> symbols;
             Asm::Lexer lexer;
-            std::fstream fd;
+
+            std::stringstream fd;
+            std::stringstream symbol_map;
     };
 
 }

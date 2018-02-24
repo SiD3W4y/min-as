@@ -36,7 +36,8 @@ namespace Codegen {
 
         check_type(user_string, Asm::TokenType::String);
 
-        symbols[name.getValue()] = fd.tellg();
+        symbols[name.getValue()] = fd.tellp();
+        symbol_map << "f str." << name.getValue() << " @ " << fd.tellp() << std::endl;
 
         fd << user_string.getValue();
         fd << '\x00';
@@ -51,7 +52,8 @@ namespace Codegen {
         Asm::Token brack = lexer.getNext();
         
         symbols[bt_name.getValue()] = fd.tellp();
-
+        symbol_map << "f bytes." << bt_name.getValue() << " @ " << fd.tellp() << std::endl;
+        
         check_type(brack, Asm::TokenType::Lbrack);
 
         Asm::Token current = lexer.getNext();
@@ -82,8 +84,9 @@ namespace Codegen {
         check_type(n_name, Asm::TokenType::Symbol);
         check_type(n_value, Asm::TokenType::Value);
 
-        symbols[n_name.getValue()] = fd.tellg();
-
+        symbols[n_name.getValue()] = fd.tellp();
+        symbol_map << "f num." << n_name.getValue() << " @ " << fd.tellp() << std::endl;
+        
         int value = Utils::str_to_int(n_value.getValue());
 
         fd.write(reinterpret_cast<char *>(&value), 4);
@@ -97,8 +100,9 @@ namespace Codegen {
         check_type(sl_name, Asm::TokenType::Symbol);
         check_type(sl_value, Asm::TokenType::Value);
 
-        symbols[sl_name.getValue()] = fd.tellg();
-
+        symbols[sl_name.getValue()] = fd.tellp();
+        symbol_map << "f slot." << sl_name.getValue() << " @ " << fd.tellp() << std::endl;
+        
         writeStub(Utils::str_to_int(sl_value.getValue()));
     }
 
@@ -106,7 +110,9 @@ namespace Codegen {
     {
         // TODO : Handle error handling for multiple definition
         Asm::Token fn_name = lexer.getNext();
-        symbols[fn_name.getValue()] = fd.tellg();
+        symbols[fn_name.getValue()] = fd.tellp();
+
+        symbol_map << "f fcn." << fn_name.getValue() << " @ " << fd.tellp() << std::endl;
     }
 
     Argument Builder::processArg()
@@ -162,7 +168,7 @@ namespace Codegen {
         if (ins.isPure()){
             fd << ins;
         }else{
-           to_patch.push_back({fd.tellg(), ins});
+           to_patch.push_back({fd.tellp(), ins});
            writeStub(ins.getSize());
         }
 
@@ -179,15 +185,18 @@ namespace Codegen {
         delete[] buff;
     }
 
-    void Builder::compile(std::string output_path)
+    std::string Builder::compile()
     {
         // TODO : Implement parsing and generation (custom stream)
         
         Asm::Token current = lexer.getNext();
-        fd.open(output_path, std::ios::out | std::ios::binary);
+        
+        // clearing the stream just in case
+        fd.str("");
 
-        if(!fd.is_open())
-            throw std::runtime_error("Could not open target file");
+        // setting up the symbol_map
+        symbol_map.str("");
+        symbol_map << "fs symbols" << std::endl;
 
         // Writing file header
         // Magic
@@ -270,6 +279,8 @@ namespace Codegen {
 
         int entrypoint = symbols["main"];
         int filesize = eof_offset;
+
+        symbol_map << "f entry @ " << entrypoint << std::endl;
         
         fd.write(reinterpret_cast<char *>(&entrypoint), 4);
         fd.write(reinterpret_cast<char *>(&filesize), 4);
@@ -277,7 +288,12 @@ namespace Codegen {
         // Dunno if it is useful
         fd.seekp(eof_offset);
 
-        fd.close();
+        return fd.str();
     }
+
+    std::string Builder::getSymbolMap()
+    {
+        return symbol_map.str();
+    }   
 
 }
