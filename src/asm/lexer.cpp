@@ -56,7 +56,7 @@ namespace Asm {
 
     Token Lexer::getNext()
     {
-    if(it >= tokens.end())
+    if(it == tokens.end())
             return Token(TokenType::Eof,"");
 
         Token tk = *it;
