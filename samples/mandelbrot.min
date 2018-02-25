@@ -1,3 +1,7 @@
+; program transpiled from brainfuck implementation
+; it is totally unoptimised both memory wise and operand wise (no compression of recurrent instructions)
+; it is a PoC to show you that min-as can compile pretty big files without any problems
+
 fn main
 
 mov $C #memory
