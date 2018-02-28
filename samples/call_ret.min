@@ -1,0 +1,42 @@
+string str_1 "printed from function\n"
+string str_2 "re-printed from function\n"
+
+fn print
+	mov $C $A
+	mov $D $B
+	mov $A 0x00
+	mov $B 0x00
+	sys
+	ret
+
+fn strlen
+    xor $B $B
+    fn __loop0_strlen_begin
+    ldrb $C $A
+    cmp $C 0x00
+    je #__loop0_strlen_end
+    add $B 0x1
+    add $A 0x1
+    jmp #__loop0_strlen_begin
+    fn __loop0_strlen_end
+
+    mov $A $B
+    ret
+
+fn main
+    mov $A #str_1
+    call #strlen
+    
+    mov $B $A
+	mov $A #str_1
+	call #print
+
+    mov $A #str_2
+
+    mov $B $A
+	mov $A #str_2
+	call #print
+
+	mov $A 0x02
+	xor $B $B
+	sys
